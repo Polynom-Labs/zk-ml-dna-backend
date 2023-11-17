@@ -1,5 +1,8 @@
 package dna.zkml.plugins
 
+import dna.zkml.createContractProjectFromTemplate
+import dna.zkml.snarkOsDeploy
+import dna.zkml.leoBuild
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -10,6 +13,7 @@ import java.io.File
 import java.io.InputStreamReader
 
 data class Research(
+    val id: Long,
     val contractName: String,
     val title: String,
     val description: String,
@@ -24,8 +28,6 @@ object ResearchRepository {
         researches.add(research)
     }
 
-    fun size() = researches.size
-
     fun loadAll() = researches
 
 }
@@ -38,14 +40,23 @@ fun Application.configureRouting() {
     }
 
     routing {
+        get("/researches/{id}") {
+            call.parameters["id"]?.toLongOrNull()?.let { id ->
+                call.respond(ResearchRepository.loadAll().filter { it.id == id })
+            }
+
+        }
+    }
+
+    routing {
         post("/upload") {
             val multipartData = call.receiveMultipart()
 
             var title = ""
             var description = ""
-            val numLabel = (ResearchRepository.size() + 1).toString().padStart(3, '0')
+            val numLabel = (System.currentTimeMillis() / 1000L).toString()
             val appName = "zk_ml_dna_${numLabel}_v0"
-            val contractName = "${appName}.aleo"
+            val fullContractName = "${appName}.aleo"
             val modelFilePath = "uploads/zk_ml_dna_${numLabel}_v0.ml"
             val modelFile = File(modelFilePath)
             modelFile.delete()
@@ -83,6 +94,13 @@ fun Application.configureRouting() {
                 val exitVal = process.waitFor()
                 if (exitVal == 0) {
                     println("Project generation success")
+
+                    val projectDir = createContractProjectFromTemplate(
+                        "gen/$appName",
+                        appName
+                    )
+                    leoBuild(projectDir)
+                    snarkOsDeploy(projectDir, fullContractName, "APrivateKey1zkpDfeQmjkwMeCeZVKgi3wRbey59V7b3q4gmWVw4wEUAwrY")
                 } else {
                     println("Project generation error: $exitVal")
                 }
@@ -91,7 +109,8 @@ fun Application.configureRouting() {
             }
 
             val research = Research(
-                contractName = contractName,
+                id = numLabel.toLong(),
+                contractName = fullContractName,
                 title = title,
                 description = description,
                 modelFilePath = modelFilePath

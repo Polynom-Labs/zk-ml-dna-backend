@@ -1,6 +1,7 @@
 .gradle
 build/
 gen/
+leo/zk_ml_dna**
 uploads/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
