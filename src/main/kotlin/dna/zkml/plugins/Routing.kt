@@ -42,7 +42,7 @@ fun Application.configureRouting() {
     routing {
         get("/researches/{id}") {
             call.parameters["id"]?.toLongOrNull()?.let { id ->
-                call.respond(ResearchRepository.loadAll().filter { it.id == id })
+                call.respond(ResearchRepository.loadAll().first { it.id == id })
             }
 
         }
