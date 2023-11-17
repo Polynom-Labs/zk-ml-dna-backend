@@ -1,0 +1,25 @@
+{
+  "researches": [
+    {
+      "id": 1700247804,
+      "contractName": "zk_ml_dna_1700247804_v0.aleo",
+      "title": "Cardio-vascular research",
+      "description": "Check-up",
+      "modelFilePath": "uploads/zk_ml_dna_1700247804_v0.ml"
+    },
+    {
+      "id": 1700246715,
+      "contractName": "zk_ml_dna_1700246715_v0.aleo",
+      "title": "my_new_research",
+      "description": "my_res_desc",
+      "modelFilePath": "uploads/zk_ml_dna_1700246715_v0.ml"
+    },
+    {
+      "id": 1700246855,
+      "contractName": "zk_ml_dna_1700246855_v0.aleo",
+      "title": "Cardio-vascular",
+      "description": "desc desc",
+      "modelFilePath": "uploads/zk_ml_dna_1700246855_v0.ml"
+    }
+  ]
+}

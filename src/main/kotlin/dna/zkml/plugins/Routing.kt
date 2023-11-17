@@ -1,5 +1,6 @@
 package dna.zkml.plugins
 
+import com.google.gson.Gson
 import dna.zkml.createContractProjectFromTemplate
 import dna.zkml.snarkOsDeploy
 import dna.zkml.leoBuild
@@ -12,6 +13,9 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 
+data class Storage(
+    val researches: List<Research>
+)
 data class Research(
     val id: Long,
     val contractName: String,
@@ -22,13 +26,27 @@ data class Research(
 
 object ResearchRepository {
 
-    private val researches = mutableListOf<Research>()
+    private val researchesInMemory = mutableListOf<Research>()
 
+
+    private val STORAGE_FILE = "storage.json"
+    init {
+        val storageFile = File(STORAGE_FILE)
+        if (storageFile.exists()) {
+            val json = storageFile.readText()
+            val storageObject = Gson().fromJson(json, Storage::class.java)
+            researchesInMemory.addAll(storageObject.researches)
+        }
+    }
     fun add(research: Research) {
-        researches.add(research)
+        researchesInMemory.add(research)
+
+        val json = Gson().toJson(Storage(researchesInMemory))
+        val storageFile = File(STORAGE_FILE)
+        storageFile.writeText(json)
     }
 
-    fun loadAll() = researches
+    fun loadAll() = researchesInMemory
 
 }
 
