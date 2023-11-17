@@ -7,7 +7,7 @@ program zk_ml_dna_v0.aleo {
     }
 
     struct BiometricInput {
-        x0: i8, x1: i8, x2: i8, x3: i8, x4: i8, x5: i8, x6: i8, x7: i8, x8: i8, x9: i8, x10: i8, x11: i8, x12: i8, x13: i8, x14: i8
+        // *** ML_INPUT_PLACEHOLDER ***
     }
 
     // research id to distributed rewards amount,
@@ -78,6 +78,6 @@ program zk_ml_dna_v0.aleo {
         Mapping::set(submitted_biometric_inputs, model_input_hash, true);
     }
 
-    // *** ML FUNCTION PLACEHOLDER ***
+    // *** ML_FUNCTION_PLACEHOLDER ***
 
 }
