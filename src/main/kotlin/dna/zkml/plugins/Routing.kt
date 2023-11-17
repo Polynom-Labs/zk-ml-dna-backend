@@ -5,8 +5,9 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.util.reflect.*
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 
 data class Research(
     val contractName: String,
@@ -42,9 +43,14 @@ fun Application.configureRouting() {
 
             var title = ""
             var description = ""
-            val label = (ResearchRepository.size() + 1).toString().padStart(3, '0')
-            val contractName = "zk_ml_dna_${label}_v0.aleo"
-            val modelFilePath = "uploads/zk_ml_dna_${label}_v0.ml"
+            val numLabel = (ResearchRepository.size() + 1).toString().padStart(3, '0')
+            val appName = "zk_ml_dna_${numLabel}_v0"
+            val contractName = "${appName}.aleo"
+            val modelFilePath = "uploads/zk_ml_dna_${numLabel}_v0.ml"
+            val modelFile = File(modelFilePath)
+            modelFile.delete()
+            modelFile.parentFile.mkdirs()
+            modelFile.createNewFile()
 
             multipartData.forEachPart { part ->
                 when (part) {
@@ -57,10 +63,6 @@ fun Application.configureRouting() {
 
                     is PartData.FileItem -> {
                         val fileBytes = part.streamProvider().readBytes()
-                        val modelFile = File(modelFilePath)
-                        modelFile.delete()
-                        modelFile.parentFile.mkdirs()
-                        modelFile.createNewFile()
 
                         modelFile.writeBytes(fileBytes)
                     }
@@ -68,6 +70,24 @@ fun Application.configureRouting() {
                     else -> {}
                 }
                 part.dispose()
+            }
+
+            val processBuilder = ProcessBuilder()
+                .command("python3", "python/ml_model_processor.py", modelFile.absolutePath, "gen/", appName)
+            try {
+                val process: Process = processBuilder.start()
+                val reader = BufferedReader(InputStreamReader(process.errorStream))
+                val line = reader.readText();
+                println(line)
+
+                val exitVal = process.waitFor()
+                if (exitVal == 0) {
+                    println("Project generation success")
+                } else {
+                    println("Project generation error: $exitVal")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
 
             val research = Research(
