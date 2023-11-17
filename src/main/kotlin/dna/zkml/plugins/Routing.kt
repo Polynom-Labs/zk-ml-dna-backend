@@ -21,7 +21,8 @@ data class Research(
     val contractName: String,
     val title: String,
     val description: String,
-    val modelFilePath: String
+    val modelFilePath: String,
+    val imageUrl: String?
 )
 
 object ResearchRepository {
@@ -131,7 +132,8 @@ fun Application.configureRouting() {
                 contractName = fullContractName,
                 title = title,
                 description = description,
-                modelFilePath = modelFilePath
+                modelFilePath = modelFilePath,
+                imageUrl = null
             )
             ResearchRepository.add(
                 research
